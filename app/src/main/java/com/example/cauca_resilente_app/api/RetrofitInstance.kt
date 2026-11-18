@@ -1,19 +1,16 @@
 package com.example.cauca_resilente_app.api
 
-
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
+import com.example.cauca_resilente_app.api.CaucaResilienteApiService
+import com.example.cauca_resilente_app.api.SessionManager
 import retrofit2.converter.gson.GsonConverterFactory
+
 import java.util.concurrent.TimeUnit
 
 object RetrofitInstance {
-    // IP LAN de este PC (sirve en emulador y dispositivo físico en la misma red).
-    // Alternativas:
-    // - Emulador con adb reverse tcp:3000 tcp:3000 -> "http://127.0.0.1:3000/"
-    // - Emulador -> "http://10.0.2.2:3000/" (en este equipo falla por la red WiFi del emulador)
-    // - Producción -> "https://tu-dominio.com/"
-    private const val BASE_URL = "http://192.168.20.196:3000/"
+    private const val BASE_URL = "https://cauca-resiliente-api-production.up.railway.app/"
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
@@ -44,7 +41,5 @@ object RetrofitInstance {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(CaucaResilienteApiService::class.java)
-
-
     }
 }

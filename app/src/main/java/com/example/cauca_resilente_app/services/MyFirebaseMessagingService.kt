@@ -14,7 +14,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     // ⚠️ CAMBIA ESTA URL por la URL real de tu backend en Render/Railway
-    private val baseUrl = "https://TU-BACKEND-REAL.onrender.com/"
+    private val baseUrl = "https://cauca-resiliente-api-production.up.railway.app/"
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)

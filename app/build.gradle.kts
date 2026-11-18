@@ -19,6 +19,14 @@ val mapsApiKey: String = localProperties.getProperty("MAPS_API_KEY")
     ?: System.getenv("MAPS_API_KEY")
     ?: ""
 
+// Datos de la firma de release (archivo local, no se sube a git).
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = Properties().apply {
+    if (keystorePropertiesFile.exists()) {
+        keystorePropertiesFile.inputStream().use { load(it) }
+    }
+}
+
 android {
     namespace = "com.example.cauca_resilente_app"
     compileSdk {
@@ -37,8 +45,24 @@ android {
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
     }
 
+    signingConfigs {
+        create("release") {
+            if (keystorePropertiesFile.exists()) {
+                storeFile = rootProject.file(keystoreProperties.getProperty("storeFile"))
+                storePassword = keystoreProperties.getProperty("storePassword")
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
+            // Si no existe keystore.properties (p. ej. en otro equipo), se compila sin firmar
+            // en lugar de fallar; el APK distribuible se firma con el keystore local.
+            if (keystorePropertiesFile.exists()) {
+                signingConfig = signingConfigs.getByName("release")
+            }
             optimization {
                 enable = false
             }
@@ -55,6 +79,12 @@ android {
 }
 
 dependencies {
+    // Retrofit para peticiones HTTP
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    // Convertidor de JSON a Objetos de Kotlin
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    // Interceptor para ver los logs en la consola
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
     implementation("androidx.compose.material:material-icons-extended")
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
@@ -104,6 +134,8 @@ dependencies {
     // For example, add the dependencies for Firebase Authentication and Cloud Firestore
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
 
         implementation(platform("com.google.firebase:firebase-bom:34.19.0"))
